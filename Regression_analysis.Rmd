@@ -1,11 +1,12 @@
 ---
 title: "Regression Analysis for gender equality in salaries for Non-Profits"
 author: "Ignacio Pezo Salazar"
-output: 
-  html_document:
-    df_print: paged
-    keep_md: true
-    code_folding: hide
+output: github_document
+html_document:
+  df_print: paged
+  keep_md: true
+  code_fold: hide
+    
 ---
  
 ```{r setup, include=FALSE}
