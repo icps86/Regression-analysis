@@ -1,0 +1,336 @@
+---
+title: "Final Project"
+author: "ignacio"
+date: "April 25, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#install.packages("pander")
+#install.packages("magrittr")
+#install.packages("knitr")
+#install.packages("stargazer")
+#install.packages("ggplot2")
+
+library( pander ) # translate output to HTML / latex
+library( magrittr ) # use the pipe operator %>%
+library( knitr ) # kable function formats tables
+library( stargazer ) # format regression output
+library( ggplot2 ) # graphing functions
+
+setwd("C://Users/icps/Dropbox/3. Maxwell/3. Spring Term/2. Quantitative Analysis/Final Project")
+dat <- read.csv("PAI722-NP-COMP-DAT.csv")
+dat$FILERNAME1 <- as.character(dat$FILERNAME1)
+dat$GENDER <- as.character(dat$GENDER)
+
+```
+
+```{r}
+#Descriptives
+stargazer(dat, type="text")
+
+```
+
+```{r} 
+#PART I.& II 
+
+#A. Test the hypothesis that men get paid more than women using the salary and gender variables. What is the difference? Is the relationship statistically significant? Interpret your results.
+
+class(dat$GENDER)
+class(dat$SALARY)
+
+m1 <- lm( SALARY ~ GENDER , data=dat )
+
+stargazer(m1, header = F, type = "text")
+#47449.880 + 94388.940 #total of male salary
+
+#PART II
+# (A)	Improve upon your model from Part I by adding control variables to account for omitted variables including fixed effects for the state, and fixed effects for industry subsector (arts, education, health, etc.). Interpret your results.
+
+plot( y= log(dat$SALARY), x= dat$GENDER)
+
+#CONTROLLING FOR:
+#STATE Location of the nonprofit
+#NTMAJ12 Subsector of the nonprofit
+
+#NPAGE Nonprofit age                  
+#REVENUE Total annual revenue for the nonprofit        
+#ASSETS Total assets of the nonprofit     
+#AVGHRS Average hours worked each week
+
+#COMPARING OLS AND FIXED EFFECTS
+#OLS Regression
+ols <- lm(SALARY ~  GENDER, data=dat)
+
+#Fixed Effect Model
+fe  <- lm(SALARY ~  GENDER + factor(STATE) - 1 + factor(NTMAJ12) - 1, data=dat)
+
+stargazer( ols, fe, type="text", 
+           omit.stat = c("adj.rsq", "f","ser"), 
+           omit= c("STATE", "NTMAJ12"), #to ommit the coefficients of STATE and NTMAJ12
+           add.lines=list(c("Controlling for Sate and Sector  Fixed Effects?", "No","Yes")),
+           digits=2)
+
+
+coefficients( fe ) # model coefficients
+
+#difference between male and female salary
+#98646.45 - 61001.63
+
+#ADDING MORE CONTROL VARIABLES 
+
+#making assets and revenue variables more friendly
+
+summary(dat$REVENUE)
+barplot(sort(dat$REVENUE))
+
+summary(dat$ASSETS)
+barplot(sort(dat$ASSESTS))
+
+dat$REV.mll <- dat$REVENUE / 1000000
+dat$ASS.mll <- dat$ASSETS / 1000000
+
+
+#running regression
+fe2 <- lm(SALARY ~  GENDER + NPAGE + AVGHRS + REV.mll + ASS.mll + factor(STATE) - 1 + factor(NTMAJ12) - 1, data=dat)
+
+stargazer( ols, fe, fe2, type="text", 
+           omit.stat = c("adj.rsq", "f","ser"), 
+           omit= c("STATE", "NTMAJ12"),            
+           add.lines=list(c("Sate Fixed Effects?", "No","Yes")),
+           digits=2)
+
+#difference between male and female
+#16675.50 - - 15835.10 = 32510.6
+
+
+#identifying the highest coefficients for STATE and SECTOR
+
+x <- coefficients(fe2)
+x <- data.frame(Coefficient = as.character(names(x)), Value = x, row.names = NULL)
+
+library(dplyr)
+
+head(arrange(x, desc(Value)))
+
+#identifying the absolut highest pay
+
+x <- which.max(dat$SALARY)
+dat[x,c(2,3,6, 13)]
+colnames(dat)
+
+```
+
+
+PART III: Difference in Difference
+```{r}
+#FEMALE CHANGE
+
+#subsetting those who had male in the PRE
+x <- dat$POST == 0 & dat$GENDER == "male" 
+x <- dat$FILEREIN[x] #getting the id of the NP I want
+x <- dat$FILEREIN %in% x #creating a vector to subset them
+fem <- dat[x,]
+
+#creating an interaction variable
+fem$interaction <- fem$TREAT * fem$POST
+
+#running the regression
+dd1 <- lm(SALARY ~ POST + TREAT + interaction, data = fem)
+
+
+#MALE CHANGE
+
+#subsetting those who had female in the PRE
+x <- dat$POST == 0 & dat$GENDER == "female" 
+x <- dat$FILEREIN[x] #getting the id of the NP I want
+x <- dat$FILEREIN %in% x #creating a vector to subset them
+male <- dat[x,]
+
+#creating an interaction variable
+male$interaction <- male$TREAT * male$POST
+
+#running the regression
+dd2 <- lm(SALARY ~ POST + TREAT + interaction, data = male)
+colnames(male)
+
+#RESULTS
+stargazer( dd1, dd2, type="text", 
+           omit.stat = c("adj.rsq", "f","ser"), 
+           digits=2)
+
+# calculating differences
+
+#DD1
+#treatment group 141089.10 - 29563.51 = 111525.6
+
+#Counterfactuals
+#41357.21 - 25449.74 = 15907.47
+#15907.47/41357.21 * 100
+
+#141089.10 + -29563.51 + 3166.18 = 114691.8
+#92399.49 + 7131.74 + 4312.10 = 103843.3
+
+
+#plotting salaries MALE to FEMALE
+options(scipen=5)
+time <- 1:2
+trt <- c(141089-29563, 141089-29563+3166-41357)
+con <- c(141089, 141089 + 3166)
+cf <- c(141089-29563, 141089-29563+3166)
+
+plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="Difference in Difference Model: \n Male-Female ED change and its effect on salary", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
+
+points(x = time, y= trt, type="b", pch=19, col=adjustcolor("darkblue", alpha.f = .6), cex = 2, lwd = 2 )
+points(x = time, y= con, type="b", pch=19, col=adjustcolor("firebrick", alpha.f = .6), cex = 2, lwd = 2 )
+axis(1, at=1:2, labels= c("2012", "2013"))
+
+text(time, trt, paste("$",trt,sep=""), cex = .8, pos=3, col=adjustcolor("darkblue", alpha.f = .6))
+text(time, con, paste("$",con,sep=""), cex = .8, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
+text(2, cf[2], paste("$",cf[2],sep=""), cex = .8, pos=3, col=adjustcolor("grey10", alpha.f = .6))
+text(1.5, cf[2], "CounterFactual", cex = 1, pos=3, col=adjustcolor("grey10", alpha.f = .6))
+text(1.5, trt[2]-7000, "Treatment\n(male to female)", cex = 1, pos=3, col=adjustcolor("darkblue", alpha.f = .6))
+text(1.5, con[2], "Control", cex = 1, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
+
+#FEMALE to MALE
+
+options(scipen=5)
+time <- 1:2
+trt <- c(92399+7131, 92399+7131+4312-25449)
+con <- c(92399, 92399 + 4312)
+cf <- c(92399+7131, 92399+7131+4312)
+
+plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="Difference in Difference Model: \nFemale-Male ED change and its effect on salary", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
+
+points(x = time, y= trt, type="b", pch=19, col=adjustcolor("darkblue", alpha.f = .6), cex = 2, lwd = 2 )
+points(x = time, y= con, type="b", pch=19, col=adjustcolor("firebrick", alpha.f = .6), cex = 2, lwd = 2 )
+axis(1, at=1:2, labels= c("2012", "2013"))
+
+text(time, trt, paste("$",trt,sep=""), cex = .8, pos=3, col=adjustcolor("darkblue", alpha.f = .6))
+text(time, con, paste("$",con,sep=""), cex = .8, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
+text(2, cf[2], paste("$",cf[2],sep=""), cex = .8, pos=3, col=adjustcolor("grey10", alpha.f = .6))
+text(1.5, cf[2], "CounterFactual", cex = 1, pos=3, col=adjustcolor("grey10", alpha.f = .6))
+text(1.5, trt[2]-500, "Treatment\n(female to male)", cex = 1, pos=3, col=adjustcolor("darkblue", alpha.f = .6))
+text(1.5, con[2]-2000, "Control", cex = 1, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
+
+```
+
+
+```{r, eval= F}
+#cheking using means comparison - fem
+# Compute the four data points needed in the DID calculation:
+a <- sapply(subset(fem, POST == 0 & TREAT == 0, select= SALARY), mean)
+b <- sapply(subset(fem, POST == 0 & TREAT == 1, select= SALARY), mean)
+c <- sapply(subset(fem, POST == 1 & TREAT == 0, select= SALARY), mean)
+d <- sapply(subset(fem, POST == 1 & TREAT == 1, select= SALARY), mean)
+
+# Compute the effect of the EITC on the employment of women with children:
+(d-c)-(b-a)
+
+#cheking using means comparison - male
+# Compute the four data points needed in the DID calculation:
+a <- sapply(subset(male, POST == 0 & TREAT == 0, select= SALARY), mean)
+b <- sapply(subset(male, POST == 0 & TREAT == 1, select= SALARY), mean)
+c <- sapply(subset(male, POST == 1 & TREAT == 0, select= SALARY), mean)
+d <- sapply(subset(male, POST == 1 & TREAT == 1, select= SALARY), mean)
+
+# Compute the effect of the EITC on the employment of women with children:
+(d-c)-(b-a)
+
+```
+
+
+PART IV
+
+```{r}
+
+#subsetting the data to only 2012
+x <- dat$POST == 0
+dat12 <- dat[x,]
+
+#Log-log  regression
+m1 <- lm(log(SALARY+1) ~ log(REVENUE+1), data = dat12)
+
+
+#transofrming logs
+exp(6.43)
+6.43 + 0.34*log(1000000)
+exp(11.12727)
+
+exp(6.43 + 0.34*log(10000000))
+
+#adding gender to the model
+m2 <- lm(log(SALARY+1) ~ log(REVENUE+1) + GENDER + log(REVENUE+1):GENDER, data = dat12)
+
+stargazer( m1, m2, type="text", 
+           omit.stat = c("adj.rsq", "f","ser"), 
+           digits=2)
+
+#how to determine what is a big or small NP?
+summary(dat12$REVENUE)
+
+plot(sort(dat12$REVENUE, decreasing = T))
+
+summary(log(dat12$REVENUE+1))
+#when revenue = 0
+#male
+exp((6.81 - 0.63) + (0.31+ 0.05)*0)= 482.992
+
+#female
+exp((6.81) + (0.31)*0)= 906.8708
+
+482.992 - 906.8708 = -423.8788
+
+423.8788/482.992*100
+
+482.992 * 1.87761
+
+#Small, male 100k
+exp((6.81 - 0.63) + (0.31+ 0.05)*log(100000))= 30474.73
+
+#small female
+exp((6.81) + (0.31)*log(100000))= 32176.99
+
+30474.73 - 32176.99 = -1702.26
+
+#big male 1million
+exp((6.81 - 0.63) + (0.31+ 0.05)*log(1000000))= 69813.58
+
+#big female
+exp((6.81) + (0.31)*log(1000000))= 65696.98
+
+69813.58 - 65696.98 = 4116.6
+
+#extra big male 10 million
+exp((6.81 - 0.63) + (0.31+ 0.05)*log(10000000))=  159933.7
+
+#extra big female
+exp((6.81) + (0.31)*log(10000000))=  134136
+
+159933.7 - 134136 = 25797.7
+
+#superextra big male billion
+exp((6.81 - 0.63) + (0.31+ 0.05)*log(100000000))=  366386.9
+
+#superextra big female
+exp((6.81) + (0.31)*log(100000000))=  273870.6
+
+366386.9 - 273870.6 = 92516.3
+
+
+#plotting salaries
+options(scipen=5)
+salaries <- data.frame(Size = c("0", "100k", "1M", "10M", "100M"), Male = c(482.992, 30475,69814,159934,366387), Female = c(907,32177,65697,134136,273871), stringsAsFactors = F)
+plot(x = 1:5, y= salaries$Male, ylab="Salary", xlab="NP Revenue", type="b", bty="n", pch=19,main="NP Revenue size and Salaries for Male and Female ED", xaxt = "n", yaxt="n", col="darkblue")
+points(x = 1:5, y= salaries$Female, type="b", pch=19, col="firebrick")
+
+axis(1, at=1:5, labels= salaries$Size)
+axis(2, at=c(0,100000,200000,300000,400000), labels= c("0", "100k", "200k", "300k", "400k"), las=2)
+text(4, salaries$Male[4]+60000, "Male EDs", cex = 1, pos=3, col=adjustcolor("darkblue", alpha.f = 1))
+text(4.5, salaries$Female[4], "Female EDs", cex = 1, pos=1, col=adjustcolor("firebrick", alpha.f = 1))
+
+
+summary(salaries$Male)
+     
+```
+
