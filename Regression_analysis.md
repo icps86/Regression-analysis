@@ -85,7 +85,7 @@ stargazer(ols, header = F, type = "text")
 plot(y= log(dat$SALARY), x= as.factor(dat$GENDER))
 ```
 
-![](Final_Project_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![](Regression_analysis_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 According to this analysis, male and women executive directors earn significantly different average salaries:
 
 * ED Female average salary: 94,388.94
@@ -315,7 +315,7 @@ text(1.5, trt[2]-7000, "Treatment\n(male to female)", cex = 1, pos=3, col=adjust
 text(1.5, con[2], "Control", cex = 1, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
 ```
 
-![](Final_Project_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](Regression_analysis_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 #ii) Change in salary when hiring a male
@@ -340,7 +340,7 @@ text(1.5, trt[2]-500, "Treatment\n(female to male)", cex = 1, pos=3, col=adjustc
 text(1.5, con[2]-2000, "Control", cex = 1, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
 ```
 
-![](Final_Project_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
+![](Regression_analysis_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 *DD1 (male to female)*
 
@@ -475,7 +475,7 @@ summary(dat12$REVENUE)
 plot(sort(dat12$REVENUE, decreasing = T))
 ```
 
-![](Final_Project_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](Regression_analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 ```r
 summary(log(dat12$REVENUE+1))
