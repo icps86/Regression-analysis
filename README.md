@@ -1,5 +1,5 @@
 # Regression-analysis
-This is a code sample to show different regression analysis in R.
+This is a code sample to show different regression analysis in R. Please access the "Regression_analysis.md" file for better visualization.
 
 The analysis explores the current gender pay gap in the nonprofit sector using finance data collected from tax reports (From 990) and made electronically available to the public by the IRS. 
 
