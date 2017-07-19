@@ -1,35 +1,7 @@
----
-title: "Regression Analysis for gender equality in salaries for Non-Profits"
-author: "Ignacio Pezo Salazar"
-output: 
-  html_document:
-    df_print: paged
-    keep_md: true
-    code_folding: hide
----
+# Regression Analysis for gender equality in salaries for Non-Profits
+Ignacio Pezo Salazar  
 
-```{r setup, include=FALSE}
-#install.packages("pander")
-#install.packages("magrittr")
-#install.packages("knitr")
-#install.packages("stargazer")
-#install.packages("ggplot2")
 
-library( pander ) # translate output to HTML / latex
-library( magrittr ) # use the pipe operator %>%
-library( knitr ) # kable function formats tables
-library( stargazer ) # format regression output
-library( ggplot2 ) # graphing functions
-library(dplyr)
-
-#loading data from github file
-dat <- readRDS(gzcon(url("https://github.com/icps86/Regression-analysis/blob/master/NP_data.rds?raw=true")))
-
-#formatting some variables into the desired class
-dat$FILERNAME1 <- as.character(dat$FILERNAME1)
-dat$GENDER <- as.character(dat$GENDER)
-
-```
 
 ##Introduction
 
@@ -40,8 +12,29 @@ According to 2015 data from the Census Bureau ([link here](https://www.census.go
 This study used NPs finance data collected from tax reports (From 990) and made electronically available to the public by the IRS. The data is from years 2012 and 2013 with variables of the NP like age, id, state, sector, executive director (ED) gender and salary, ED's average hours per week, and other relevant financial information. Private information was replaced. Although these data was used as control variables to adjust the comparisons and improve internal validity, some key information is missing in the dataset: the ED's profession, educational background, previous job experience, and the number of years in the present NP. There was unavailable data to account for these variables.
 
 *General Descriptives of the Dataset*
-```{r}
+
+```r
 stargazer(dat, type="text")
+```
+
+```
+## 
+## ===================================================================================
+## Statistic           N         Mean          St. Dev.         Min          Max      
+## -----------------------------------------------------------------------------------
+## FILEREIN          68,214 454,373,178.000 266,437,875.000 10,024,645   996,012,377  
+## NPAGE             65,428     28.942          18.522          -1           110      
+## TAXYR             68,214    2,012.500         0.500         2,012        2,013     
+## RULEDATE          65,548   198,098.800      8,683.202         0         201,404    
+## REVENUE           65,548 12,737,572.000  89,781,390.000  -12,172,689 5,840,349,457 
+## ASSETS            65,548 24,573,829.000  437,214,262.000 -6,295,553  72,763,619,000
+## AVGHRS            68,214     39.328           9.260         1.150       168.000    
+## SALARY            68,214   118,178.900     153,774.200        2        13,573,496  
+## PROPORTION_FEMALE 68,135      0.496           0.486         0.000        1.000     
+## M2012CEO          68,214      0.502           0.500           0            1       
+## TREAT             68,214      0.018           0.134           0            1       
+## POST              68,214      0.500           0.500           0            1       
+## -----------------------------------------------------------------------------------
 ```
 
 ##Regression Analysis
@@ -58,14 +51,38 @@ Each one of these models was chosen as a final result because they shed light in
 ###Model 1: OLS
 
 Naive model of Salary onto Gender without any controls
-```{r} 
+
+```r
 ols <- lm( SALARY ~ GENDER , data=dat )
 
 stargazer(ols, header = F, type = "html")
-
-plot(y= log(dat$SALARY), x= as.factor(dat$GENDER))
+```
 
 ```
+## 
+## <table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
+## <tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
+## <tr><td style="text-align:left"></td><td>SALARY</td></tr>
+## <tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">GENDERmale</td><td>47,449.880<sup>***</sup></td></tr>
+## <tr><td style="text-align:left"></td><td>(1,164.503)</td></tr>
+## <tr><td style="text-align:left"></td><td></td></tr>
+## <tr><td style="text-align:left">Constant</td><td>94,388.940<sup>***</sup></td></tr>
+## <tr><td style="text-align:left"></td><td>(824.714)</td></tr>
+## <tr><td style="text-align:left"></td><td></td></tr>
+## <tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>68,135</td></tr>
+## <tr><td style="text-align:left">R<sup>2</sup></td><td>0.024</td></tr>
+## <tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.024</td></tr>
+## <tr><td style="text-align:left">Residual Std. Error</td><td>151,982.600 (df = 68133)</td></tr>
+## <tr><td style="text-align:left">F Statistic</td><td>1,660.308<sup>***</sup> (df = 1; 68133)</td></tr>
+## <tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
+## </table>
+```
+
+```r
+plot(y= log(dat$SALARY), x= as.factor(dat$GENDER))
+```
+
+![](Final_Project_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 According to this analysis, male and women executive directors earn significantly different average salaries:
 
 * ED Female average salary: 94,388.94
@@ -76,7 +93,8 @@ According to this analysis, male and women executive directors earn significantl
 
 We will improve the first model by adding control variables to account for omitted variables including fixed effects for the state, and fixed effects for industry subsector (arts, education, health, etc.). 
 
-```{r} 
+
+```r
 #Fixed effects for:
 #STATE Location of the nonprofit
 #NTMAJ12 Subsector of the nonprofit
@@ -100,6 +118,44 @@ stargazer( ols, fe, type="html",
            omit= c("STATE", "NTMAJ12"),            
            add.lines=list(c("Sate Fixed Effects?", "No","Yes")),
            digits=2)
+```
+
+```
+## 
+## <table style="text-align:center"><tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="2"><em>Dependent variable:</em></td></tr>
+## <tr><td></td><td colspan="2" style="border-bottom: 1px solid black"></td></tr>
+## <tr><td style="text-align:left"></td><td colspan="2">SALARY</td></tr>
+## <tr><td style="text-align:left"></td><td>OLS</td><td>Fixed Effects</td></tr>
+## <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td></tr>
+## <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">GENDERfemale</td><td></td><td>-15,835.10<sup>**</sup></td></tr>
+## <tr><td style="text-align:left"></td><td></td><td>(7,124.54)</td></tr>
+## <tr><td style="text-align:left"></td><td></td><td></td></tr>
+## <tr><td style="text-align:left">GENDERmale</td><td>47,449.88<sup>***</sup></td><td>16,675.50<sup>**</sup></td></tr>
+## <tr><td style="text-align:left"></td><td>(1,164.50)</td><td>(7,125.55)</td></tr>
+## <tr><td style="text-align:left"></td><td></td><td></td></tr>
+## <tr><td style="text-align:left">NPAGE</td><td></td><td>854.76<sup>***</sup></td></tr>
+## <tr><td style="text-align:left"></td><td></td><td>(27.29)</td></tr>
+## <tr><td style="text-align:left"></td><td></td><td></td></tr>
+## <tr><td style="text-align:left">AVGHRS</td><td></td><td>1,391.33<sup>***</sup></td></tr>
+## <tr><td style="text-align:left"></td><td></td><td>(52.27)</td></tr>
+## <tr><td style="text-align:left"></td><td></td><td></td></tr>
+## <tr><td style="text-align:left">REV.mll</td><td></td><td>754.29<sup>***</sup></td></tr>
+## <tr><td style="text-align:left"></td><td></td><td>(7.15)</td></tr>
+## <tr><td style="text-align:left"></td><td></td><td></td></tr>
+## <tr><td style="text-align:left">ASS.mll</td><td></td><td>-35.40<sup>***</sup></td></tr>
+## <tr><td style="text-align:left"></td><td></td><td>(1.44)</td></tr>
+## <tr><td style="text-align:left"></td><td></td><td></td></tr>
+## <tr><td style="text-align:left">Constant</td><td>94,388.94<sup>***</sup></td><td></td></tr>
+## <tr><td style="text-align:left"></td><td>(824.71)</td><td></td></tr>
+## <tr><td style="text-align:left"></td><td></td><td></td></tr>
+## <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Sate Fixed Effects?</td><td>No</td><td>Yes</td></tr>
+## <tr><td style="text-align:left">Observations</td><td>68,135</td><td>65,351</td></tr>
+## <tr><td style="text-align:left">R<sup>2</sup></td><td>0.02</td><td>0.60</td></tr>
+## <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="2" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
+## </table>
+```
+
+```r
 #difference between male and female
 #16675.50 - - 15835.10 = 32510.6
 ```
@@ -112,12 +168,18 @@ One of the weaknesses of this model is that there is no control for the baseline
 
 *Which are the top 5 largest coefficients in this model?*
 
-```{r} 
+
+```r
 x <- coefficients(fe)
 x <- data.frame(Coefficient = as.character(names(x)), Value = x, row.names = NULL)
 head(arrange(x, desc(Value)), 5)
-
 ```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Coefficient"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["Value"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"factor(NTMAJ12)EH","2":"241488.99"},{"1":"factor(NTMAJ12)BH","2":"102335.23"},{"1":"factor(STATE)DC","2":"69470.08"},{"1":"factor(STATE)MD","2":"46489.11"},{"1":"factor(NTMAJ12)MU","2":"41248.96"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 
 
 ##Model 3: Difference in Difference
@@ -138,7 +200,8 @@ ii) Change in salary when hiring a male (DD2)
 * Control group: female ED in 2012 & female ED in 2013
 
 
-```{r}
+
+```r
 #i) Change in salary when hiring a female
 
 #Before/After dummy variable: POST (where 1 is for 2013 and 0 for 2012)
@@ -174,16 +237,56 @@ male$interaction <- male$TREAT * male$POST
 #running the regression
 dd2 <- lm(SALARY ~ POST + TREAT + interaction, data = male)
 colnames(male)
+```
 
+```
+##  [1] "FILEREIN"          "FILERNAME1"        "NTMAJ12"          
+##  [4] "NPAGE"             "TAXYR"             "STATE"            
+##  [7] "RULEDATE"          "REVENUE"           "ASSETS"           
+## [10] "PERSONNM"          "TITLETXT"          "AVGHRS"           
+## [13] "SALARY"            "GENDER"            "PROPORTION_FEMALE"
+## [16] "M2012CEO"          "TREAT"             "POST"             
+## [19] "REV.mll"           "ASS.mll"           "interaction"
+```
+
+```r
 #RESULTS
 stargazer( dd1, dd2, type="text", 
            omit.stat = c("adj.rsq", "f","ser"), 
            digits=2)
 ```
 
+```
+## 
+## =========================================
+##                  Dependent variable:     
+##              ----------------------------
+##                         SALARY           
+##                   (1)            (2)     
+## -----------------------------------------
+## POST            3,166.18     4,312.10*** 
+##                (2,103.95)    (1,027.61)  
+##                                          
+## TREAT        -29,563.51***    7,131.74   
+##               (10,515.44)    (5,646.93)  
+##                                          
+## interaction  -41,357.21***  -25,449.74***
+##               (14,871.08)    (7,985.97)  
+##                                          
+## Constant     141,089.10***  92,399.49*** 
+##                (1,487.71)     (726.63)   
+##                                          
+## -----------------------------------------
+## Observations     34,272        33,942    
+## R2               0.002          0.001    
+## =========================================
+## Note:         *p<0.1; **p<0.05; ***p<0.01
+```
+
 This analysis can be visualized to make it more easy to understand:
 
-```{r}
+
+```r
 #i) Change in salary when hiring a female
 
 options(scipen=5)
@@ -204,8 +307,11 @@ text(2, cf[2], paste("$",cf[2],sep=""), cex = .8, pos=3, col=adjustcolor("grey10
 text(1.5, cf[2], "CounterFactual", cex = 1, pos=3, col=adjustcolor("grey10", alpha.f = .6))
 text(1.5, trt[2]-7000, "Treatment\n(male to female)", cex = 1, pos=3, col=adjustcolor("darkblue", alpha.f = .6))
 text(1.5, con[2], "Control", cex = 1, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
+```
 
+![](Final_Project_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
+```r
 #ii) Change in salary when hiring a male
 
 options(scipen=5)
@@ -226,8 +332,9 @@ text(2, cf[2], paste("$",cf[2],sep=""), cex = .8, pos=3, col=adjustcolor("grey10
 text(1.5, cf[2], "CounterFactual", cex = 1, pos=3, col=adjustcolor("grey10", alpha.f = .6))
 text(1.5, trt[2]-500, "Treatment\n(female to male)", cex = 1, pos=3, col=adjustcolor("darkblue", alpha.f = .6))
 text(1.5, con[2]-2000, "Control", cex = 1, pos=3, col=adjustcolor("firebrick", alpha.f = .6))
-
 ```
+
+![](Final_Project_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 *DD1 (male to female)*
 
@@ -257,41 +364,129 @@ One weakness of this design is that the comparison provides information about th
 
 ##Model 4:
 
-```{r}
 
+```r
 #subsetting the data to only 2012
 x <- dat$POST == 0
 dat12 <- dat[x,]
 
 #Log-log  regression
 m1 <- lm(log(SALARY+1) ~ log(REVENUE+1), data = dat12)
+```
 
+```
+## Warning in log(REVENUE + 1): NaNs produced
+```
 
+```r
 #transofrming logs
 exp(6.43)
+```
+
+```
+## [1] 620.1739
+```
+
+```r
 6.43 + 0.34*log(1000000)
+```
+
+```
+## [1] 11.12727
+```
+
+```r
 exp(11.12727)
+```
 
+```
+## [1] 68000.48
+```
+
+```r
 exp(6.43 + 0.34*log(10000000))
+```
 
+```
+## [1] 148769.4
+```
+
+```r
 #adding gender to the model
 m2 <- lm(log(SALARY+1) ~ log(REVENUE+1) + GENDER + log(REVENUE+1):GENDER, data = dat12)
+```
 
+```
+## Warning in log(REVENUE + 1): NaNs produced
+```
+
+```r
 stargazer( m1, m2, type="text", 
            omit.stat = c("adj.rsq", "f","ser"), 
            digits=2)
+```
 
+```
+## 
+## ========================================================
+##                                 Dependent variable:     
+##                             ----------------------------
+##                                   log(SALARY + 1)       
+##                                  (1)            (2)     
+## --------------------------------------------------------
+## log(REVENUE + 1)               0.34***        0.31***   
+##                                (0.002)        (0.003)   
+##                                                         
+## GENDERmale                                   -0.63***   
+##                                               (0.06)    
+##                                                         
+## log(REVENUE + 1):GENDERmale                   0.05***   
+##                                               (0.004)   
+##                                                         
+## Constant                       6.43***        6.81***   
+##                                 (0.03)        (0.05)    
+##                                                         
+## --------------------------------------------------------
+## Observations                    32,779        32,779    
+## R2                               0.43          0.43     
+## ========================================================
+## Note:                        *p<0.1; **p<0.05; ***p<0.01
+```
+
+```r
 #how to determine what is a big or small NP?
 summary(dat12$REVENUE)
+```
 
+```
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+##   -1037000     483200    1402000   12500000    5498000 5234000000 
+##       NA's 
+##       1296
+```
+
+```r
 plot(sort(dat12$REVENUE, decreasing = T))
+```
 
+![](Final_Project_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+```r
 summary(log(dat12$REVENUE+1))
+```
 
+```
+## Warning in log(dat12$REVENUE + 1): NaNs produced
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##    0.00   13.09   14.16   14.38   15.52   22.38    1328
 ```
 
 
-```{r, eval=FALSE}
+
+```r
 #when revenue = 0
 #male
 exp((6.81 - 0.63) + (0.31+ 0.05)*0)= 482.992
@@ -351,6 +546,5 @@ text(4.5, salaries$Female[4], "Female EDs", cex = 1, pos=1, col=adjustcolor("fir
 
 
 summary(salaries$Male)
-     
 ```
 
