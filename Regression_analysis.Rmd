@@ -1,5 +1,5 @@
 ---
-title: "Regression Analysis for gender equality in salaries for Non-Profits"
+title: "Regression Analysis for gender equality in salaries of Non-Profit Executive Directors (ED)"
 author: "Ignacio Pezo Salazar"
 output: github_document
 html_document:
@@ -8,7 +8,7 @@ html_document:
   code_fold: hide
     
 ---
- 
+
 ```{r setup, include=FALSE}
 #install.packages("pander")
 #install.packages("magrittr")
@@ -128,12 +128,12 @@ In a difference-in-difference design, the counterfactual is a calculated project
 
 *Comparing the effect of a different gender when there is a change in ED*
 
-i) Change in salary when hiring a female (DD1)
+a) Change in salary when hire is a change from male to female (DD1)
 
 * Treatment group: male ED in 2012 & female ED in 2013
 * Control group: male ED in 2012 & male ED in 2013
 
-ii) Change in salary when hiring a male (DD2)
+b) Change in salary when hire is a change from female to male (DD2)
 
 * Treatment group: female ED in 2012 & male ED in 2013
 * Control group: female ED in 2012 & female ED in 2013
@@ -174,7 +174,6 @@ male$interaction <- male$TREAT * male$POST
 
 #running the regression
 dd2 <- lm(SALARY ~ POST + TREAT + interaction, data = male)
-colnames(male)
 
 #RESULTS
 stargazer( dd1, dd2, type="text", 
@@ -193,7 +192,7 @@ trt <- c(141089-29563, 141089-29563+3166-41357)
 con <- c(141089, 141089 + 3166)
 cf <- c(141089-29563, 141089-29563+3166)
 
-plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="Difference in Difference Model: \n Male-Female ED change and its effect on salary", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
+plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="1. Change in salary when hire is a change from male to female ED (DD1)", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
 
 points(x = time, y= trt, type="b", pch=19, col=adjustcolor("darkblue", alpha.f = .6), cex = 2, lwd = 2 )
 points(x = time, y= con, type="b", pch=19, col=adjustcolor("firebrick", alpha.f = .6), cex = 2, lwd = 2 )
@@ -215,7 +214,7 @@ trt <- c(92399+7131, 92399+7131+4312-25449)
 con <- c(92399, 92399 + 4312)
 cf <- c(92399+7131, 92399+7131+4312)
 
-plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="Difference in Difference Model: \nFemale-Male ED change and its effect on salary", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
+plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="2. Change in salary when hire is a change from female to male ED (DD2)", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
 
 points(x = time, y= trt, type="b", pch=19, col=adjustcolor("darkblue", alpha.f = .6), cex = 2, lwd = 2 )
 points(x = time, y= con, type="b", pch=19, col=adjustcolor("firebrick", alpha.f = .6), cex = 2, lwd = 2 )
@@ -256,41 +255,35 @@ The Comparison shows evidence that there is a secular trend of increase in salar
 
 One weakness of this design is that the comparison provides information about the size of a change between two time periods but does not provide a slope that can be us to predict levels of the effect. An issue remains about the origin of the sample. We do not have information about how the assignment to control and treatment groups was made and, therefore, we rely in the following assumptions: (1) that NPs of treatment and control groups have the same salary change sensitivity to the independent variables (and therefore have Parallel Trends in outcome); (2) That the allocation of the treatment (gender change in ED) was not determined by any characteristic specific to the groups. 
 
+
 ##Model 4:
 
-```{r, eval=TRUE}
+This model answers a different question: "Do large nonprofits pay female s more or less equitably than small nonprofits?"
 
+In order to have a model that allows the relationship between REVENUE and SALARY to vary by GENDER, we will include a regression of the interaction between REVENUE and GENDER. This model follows a post only design, but has the virtue of pondering the interaction between NP size and gender. 
+
+To answer this, I will only work with data from 2012. This is to prevent over representing NPs (in 2012 and 2013) and also removing the bias that a change in ED gender could produce (only present in the 2013 data).
+
+Because of the large variance of the variables, I will use logs in order to make results more intuitive.
+
+
+```{r, eval=TRUE}
 #subsetting the data to only 2012
 x <- dat$POST == 0
 dat12 <- dat[x,]
 
-#Log-log  regression
-m1 <- lm(log(SALARY+1) ~ log(REVENUE+1), data = dat12)
-
-
-#transofrming logs
-exp(6.43)
-6.43 + 0.34*log(1000000)
-exp(11.12727)
-
-exp(6.43 + 0.34*log(10000000))
-
 #adding gender to the model
-m2 <- lm(log(SALARY+1) ~ log(REVENUE+1) + GENDER + log(REVENUE+1):GENDER, data = dat12)
+m1 <- lm(log(SALARY+1) ~ log(REVENUE+1) + GENDER + log(REVENUE+1):GENDER, data = dat12)
 
-stargazer( m1, m2, type="text", 
+stargazer( m1, type="text", 
            omit.stat = c("adj.rsq", "f","ser"), 
            digits=2)
 
-#how to determine what is a big or small NP?
-summary(dat12$REVENUE)
-
-plot(sort(dat12$REVENUE, decreasing = T))
-
-summary(log(dat12$REVENUE+1))
-
 ```
 
+All coefficients are statistically significant. The constant (B0), would be the amount of Salary a female ED will earn when the NP's revenue is 0. The GENDERmale coefficient (B3) determines the difference between a female ED and a male at 0 NP revenue. The log(REVENUE+1) coefficient (B1) is the "slope" of  percent increase in salary to one percent increase in NP revenue for a female. The interaction coefficient log(REVENUE+1):GENDERmale (B4) accounts for the difference in the "slope" of percent increase in salary to one percent increase in NP revenue for a male as compared to females.
+
+In the following code chunk, calculations are made to transform logs back to normal values. This will be used for a plot.
 
 ```{r, eval=FALSE}
 #when revenue = 0
@@ -338,6 +331,11 @@ exp((6.81) + (0.31)*log(100000000))=  273870.6
 
 366386.9 - 273870.6 = 92516.3
 
+```
+
+Plotting the differences:
+
+```{r, eval=TRUE}
 
 #plotting salaries
 options(scipen=5)
@@ -350,8 +348,11 @@ axis(2, at=c(0,100000,200000,300000,400000), labels= c("0", "100k", "200k", "300
 text(4, salaries$Male[4]+60000, "Male EDs", cex = 1, pos=3, col=adjustcolor("darkblue", alpha.f = 1))
 text(4.5, salaries$Female[4], "Female EDs", cex = 1, pos=1, col=adjustcolor("firebrick", alpha.f = 1))
 
-
-summary(salaries$Male)
-     
 ```
 
+
+Results show that at zero revenue levels, female EDs are earning 87% more than their male counterparts. However, as the NP size increases our model predicts that male EDs start earning more than their female counterparts. This difference happens at a constant rate, and therefore the distance becomes greater the larger the NP revenue, which means a less equitable condition for women.
+
+##Conclusion
+
+The FE model shows that there is a statistically significant difference between male and female ED in the NP sector. The DD design showed that this gender gap is also present when NPs replace their ED with a different gender. Finally, our third interaction model shows that the gender gap increases when the size of the non for profit increases. All three models show a statistically persistent gender gap in the NP sector. Overall, additional data is needed to control variables like ED's profession, educational background, previous job experience, and the number of years in the present NP. 

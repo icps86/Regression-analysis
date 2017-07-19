@@ -1,4 +1,4 @@
-Regression Analysis for gender equality in salaries for Non-Profits
+Regression Analysis for gender equality in salaries of Non-Profit Executive Directors (ED)
 ================
 Ignacio Pezo Salazar
 
@@ -188,12 +188,12 @@ In a difference-in-difference design, the counterfactual is a calculated project
 
 *Comparing the effect of a different gender when there is a change in ED*
 
-1.  Change in salary when hiring a female (DD1)
+1.  Change in salary when hire is a change from male to female (DD1)
 
 -   Treatment group: male ED in 2012 & female ED in 2013
 -   Control group: male ED in 2012 & male ED in 2013
 
-1.  Change in salary when hiring a male (DD2)
+1.  Change in salary when hire is a change from female to male (DD2)
 
 -   Treatment group: female ED in 2012 & male ED in 2013
 -   Control group: female ED in 2012 & female ED in 2013
@@ -233,18 +233,7 @@ male$interaction <- male$TREAT * male$POST
 
 #running the regression
 dd2 <- lm(SALARY ~ POST + TREAT + interaction, data = male)
-colnames(male)
-```
 
-    ##  [1] "FILEREIN"          "FILERNAME1"        "NTMAJ12"          
-    ##  [4] "NPAGE"             "TAXYR"             "STATE"            
-    ##  [7] "RULEDATE"          "REVENUE"           "ASSETS"           
-    ## [10] "PERSONNM"          "TITLETXT"          "AVGHRS"           
-    ## [13] "SALARY"            "GENDER"            "PROPORTION_FEMALE"
-    ## [16] "M2012CEO"          "TREAT"             "POST"             
-    ## [19] "REV.mll"           "ASS.mll"           "interaction"
-
-``` r
 #RESULTS
 stargazer( dd1, dd2, type="text", 
            omit.stat = c("adj.rsq", "f","ser"), 
@@ -287,7 +276,7 @@ trt <- c(141089-29563, 141089-29563+3166-41357)
 con <- c(141089, 141089 + 3166)
 cf <- c(141089-29563, 141089-29563+3166)
 
-plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="Difference in Difference Model: \n Male-Female ED change and its effect on salary", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
+plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="1. Change in salary when hire is a change from male to female ED (DD1)", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
 
 points(x = time, y= trt, type="b", pch=19, col=adjustcolor("darkblue", alpha.f = .6), cex = 2, lwd = 2 )
 points(x = time, y= con, type="b", pch=19, col=adjustcolor("firebrick", alpha.f = .6), cex = 2, lwd = 2 )
@@ -312,7 +301,7 @@ trt <- c(92399+7131, 92399+7131+4312-25449)
 con <- c(92399, 92399 + 4312)
 cf <- c(92399+7131, 92399+7131+4312)
 
-plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="Difference in Difference Model: \nFemale-Male ED change and its effect on salary", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
+plot(x = time, y= cf, ylab="", xlab="", type="b", bty="n", pch=19,main="2. Change in salary when hire is a change from female to male ED (DD2)", xaxt = "n", yaxt="n", col=adjustcolor("grey20", alpha.f = .6), cex = 2, lwd = 2, ylim=c(min(rbind(trt, con, cf)) - 10000,max(rbind(trt, con, cf))+ 10000), xlim = c(.9, 2.1))
 
 points(x = time, y= trt, type="b", pch=19, col=adjustcolor("darkblue", alpha.f = .6), cex = 2, lwd = 2 )
 points(x = time, y= con, type="b", pch=19, col=adjustcolor("firebrick", alpha.f = .6), cex = 2, lwd = 2 )
@@ -357,104 +346,58 @@ One weakness of this design is that the comparison provides information about th
 Model 4:
 --------
 
+This model answers a different question: "Do large nonprofits pay female s more or less equitably than small nonprofits?"
+
+In order to have a model that allows the relationship between REVENUE and SALARY to vary by GENDER, we will include a regression of the interaction between REVENUE and GENDER. This model follows a post only design, but has the virtue of pondering the interaction between NP size and gender.
+
+To answer this, I will only work with data from 2012. This is to prevent over representing NPs (in 2012 and 2013) and also removing the bias that a change in ED gender could produce (only present in the 2013 data).
+
+Because of the large variance of the variables, I will use logs in order to make results more intuitive.
+
 ``` r
 #subsetting the data to only 2012
 x <- dat$POST == 0
 dat12 <- dat[x,]
 
-#Log-log  regression
-m1 <- lm(log(SALARY+1) ~ log(REVENUE+1), data = dat12)
-```
-
-    ## Warning in log(REVENUE + 1): NaNs produced
-
-``` r
-#transofrming logs
-exp(6.43)
-```
-
-    ## [1] 620.1739
-
-``` r
-6.43 + 0.34*log(1000000)
-```
-
-    ## [1] 11.12727
-
-``` r
-exp(11.12727)
-```
-
-    ## [1] 68000.48
-
-``` r
-exp(6.43 + 0.34*log(10000000))
-```
-
-    ## [1] 148769.4
-
-``` r
 #adding gender to the model
-m2 <- lm(log(SALARY+1) ~ log(REVENUE+1) + GENDER + log(REVENUE+1):GENDER, data = dat12)
+m1 <- lm(log(SALARY+1) ~ log(REVENUE+1) + GENDER + log(REVENUE+1):GENDER, data = dat12)
 ```
 
     ## Warning in log(REVENUE + 1): NaNs produced
 
 ``` r
-stargazer( m1, m2, type="text", 
+stargazer( m1, type="text", 
            omit.stat = c("adj.rsq", "f","ser"), 
            digits=2)
 ```
 
     ## 
-    ## ========================================================
-    ##                                 Dependent variable:     
-    ##                             ----------------------------
-    ##                                   log(SALARY + 1)       
-    ##                                  (1)            (2)     
-    ## --------------------------------------------------------
-    ## log(REVENUE + 1)               0.34***        0.31***   
-    ##                                (0.002)        (0.003)   
-    ##                                                         
-    ## GENDERmale                                   -0.63***   
-    ##                                               (0.06)    
-    ##                                                         
-    ## log(REVENUE + 1):GENDERmale                   0.05***   
-    ##                                               (0.004)   
-    ##                                                         
-    ## Constant                       6.43***        6.81***   
-    ##                                 (0.03)        (0.05)    
-    ##                                                         
-    ## --------------------------------------------------------
-    ## Observations                    32,779        32,779    
-    ## R2                               0.43          0.43     
-    ## ========================================================
-    ## Note:                        *p<0.1; **p<0.05; ***p<0.01
+    ## =======================================================
+    ##                                 Dependent variable:    
+    ##                             ---------------------------
+    ##                                   log(SALARY + 1)      
+    ## -------------------------------------------------------
+    ## log(REVENUE + 1)                      0.31***          
+    ##                                       (0.003)          
+    ##                                                        
+    ## GENDERmale                           -0.63***          
+    ##                                       (0.06)           
+    ##                                                        
+    ## log(REVENUE + 1):GENDERmale           0.05***          
+    ##                                       (0.004)          
+    ##                                                        
+    ## Constant                              6.81***          
+    ##                                       (0.05)           
+    ##                                                        
+    ## -------------------------------------------------------
+    ## Observations                          32,779           
+    ## R2                                     0.43            
+    ## =======================================================
+    ## Note:                       *p<0.1; **p<0.05; ***p<0.01
 
-``` r
-#how to determine what is a big or small NP?
-summary(dat12$REVENUE)
-```
+All coefficients are statistically significant. The constant (B0), would be the amount of Salary a female ED will earn when the NP's revenue is 0. The GENDERmale coefficient (B3) determines the difference between a female ED and a male at 0 NP revenue. The log(REVENUE+1) coefficient (B1) is the "slope" of percent increase in salary to one percent increase in NP revenue for a female. The interaction coefficient log(REVENUE+1):GENDERmale (B4) accounts for the difference in the "slope" of percent increase in salary to one percent increase in NP revenue for a male as compared to females.
 
-    ##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
-    ##   -1037000     483200    1402000   12500000    5498000 5234000000 
-    ##       NA's 
-    ##       1296
-
-``` r
-plot(sort(dat12$REVENUE, decreasing = T))
-```
-
-![](Regression_analysis_files/figure-markdown_github/unnamed-chunk-7-1.png)
-
-``` r
-summary(log(dat12$REVENUE+1))
-```
-
-    ## Warning in log(dat12$REVENUE + 1): NaNs produced
-
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-    ##    0.00   13.09   14.16   14.38   15.52   22.38    1328
+In the following code chunk, calculations are made to transform logs back to normal values. This will be used for a plot.
 
 ``` r
 #when revenue = 0
@@ -501,8 +444,11 @@ exp((6.81 - 0.63) + (0.31+ 0.05)*log(100000000))=  366386.9
 exp((6.81) + (0.31)*log(100000000))=  273870.6
 
 366386.9 - 273870.6 = 92516.3
+```
 
+Plotting the differences:
 
+``` r
 #plotting salaries
 options(scipen=5)
 salaries <- data.frame(Size = c("0", "100k", "1M", "10M", "100M"), Male = c(482.992, 30475,69814,159934,366387), Female = c(907,32177,65697,134136,273871), stringsAsFactors = F)
@@ -513,7 +459,13 @@ axis(1, at=1:5, labels= salaries$Size)
 axis(2, at=c(0,100000,200000,300000,400000), labels= c("0", "100k", "200k", "300k", "400k"), las=2)
 text(4, salaries$Male[4]+60000, "Male EDs", cex = 1, pos=3, col=adjustcolor("darkblue", alpha.f = 1))
 text(4.5, salaries$Female[4], "Female EDs", cex = 1, pos=1, col=adjustcolor("firebrick", alpha.f = 1))
-
-
-summary(salaries$Male)
 ```
+
+![](Regression_analysis_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+Results show that at zero revenue levels, female EDs are earning 87% more than their male counterparts. However, as the NP size increases our model predicts that male EDs start earning more than their female counterparts. This difference happens at a constant rate, and therefore the distance becomes greater the larger the NP revenue, which means a less equitable condition for women.
+
+Conclusion
+----------
+
+The FE model shows that there is a statistically significant difference between male and female ED in the NP sector. The DD design showed that this gender gap is also present when NPs replace their ED with a different gender. Finally, our third interaction model shows that the gender gap increases when the size of the non for profit increases. All three models show a statistically persistent gender gap in the NP sector. Overall, additional data is needed to control variables like ED's profession, educational background, previous job experience, and the number of years in the present NP.
