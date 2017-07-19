@@ -183,24 +183,27 @@ $(document).ready(function () {
 <p>Naive model of Salary onto Gender without any controls</p>
 <pre class="r"><code>ols &lt;- lm( SALARY ~ GENDER , data=dat )
 
-stargazer(ols, header = F, type = &quot;html&quot;)</code></pre>
+stargazer(ols, header = F, type = &quot;text&quot;)</code></pre>
 <pre><code>## 
-## &lt;table style=&quot;text-align:center&quot;&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan=&quot;1&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;SALARY&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td colspan=&quot;2&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;GENDERmale&lt;/td&gt;&lt;td&gt;47,449.880&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(1,164.503)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Constant&lt;/td&gt;&lt;td&gt;94,388.940&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(824.714)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td colspan=&quot;2&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Observations&lt;/td&gt;&lt;td&gt;68,135&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.024&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.024&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;151,982.600 (df = 68133)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;F Statistic&lt;/td&gt;&lt;td&gt;1,660.308&lt;sup&gt;***&lt;/sup&gt; (df = 1; 68133)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td colspan=&quot;2&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
-## &lt;/table&gt;</code></pre>
+## ================================================
+##                         Dependent variable:     
+##                     ----------------------------
+##                                SALARY           
+## ------------------------------------------------
+## GENDERmale                 47,449.880***        
+##                             (1,164.503)         
+##                                                 
+## Constant                   94,388.940***        
+##                              (824.714)          
+##                                                 
+## ------------------------------------------------
+## Observations                   68,135           
+## R2                             0.024            
+## Adjusted R2                    0.024            
+## Residual Std. Error   151,982.600 (df = 68133)  
+## F Statistic         1,660.308*** (df = 1; 68133)
+## ================================================
+## Note:                *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
 <pre class="r"><code>plot(y= log(dat$SALARY), x= as.factor(dat$GENDER))</code></pre>
 <p><img src="data:image/png;base64,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" /><!-- --> According to this analysis, male and women executive directors earn significantly different average salaries:</p>
 <ul>
@@ -229,44 +232,47 @@ dat$ASS.mll &lt;- dat$ASSETS / 1000000
 #running regression
 fe &lt;- lm(SALARY ~  GENDER + NPAGE + AVGHRS + REV.mll + ASS.mll + factor(STATE) - 1 + factor(NTMAJ12) - 1, data=dat)
 
-stargazer( ols, fe, type=&quot;html&quot;, 
+stargazer( ols, fe, type=&quot;text&quot;, 
            column.labels = c(&quot;OLS&quot;, &quot;Fixed Effects&quot;),
            omit.stat = c(&quot;adj.rsq&quot;, &quot;f&quot;,&quot;ser&quot;), 
            omit= c(&quot;STATE&quot;, &quot;NTMAJ12&quot;),            
            add.lines=list(c(&quot;Sate Fixed Effects?&quot;, &quot;No&quot;,&quot;Yes&quot;)),
            digits=2)</code></pre>
 <pre><code>## 
-## &lt;table style=&quot;text-align:center&quot;&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot;&gt;SALARY&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;OLS&lt;/td&gt;&lt;td&gt;Fixed Effects&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;GENDERfemale&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-15,835.10&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(7,124.54)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;GENDERmale&lt;/td&gt;&lt;td&gt;47,449.88&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;16,675.50&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(1,164.50)&lt;/td&gt;&lt;td&gt;(7,125.55)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;NPAGE&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;854.76&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(27.29)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;AVGHRS&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1,391.33&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(52.27)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;REV.mll&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;754.29&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(7.15)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;ASS.mll&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-35.40&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(1.44)&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Constant&lt;/td&gt;&lt;td&gt;94,388.94&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(824.71)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Sate Fixed Effects?&lt;/td&gt;&lt;td&gt;No&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Observations&lt;/td&gt;&lt;td&gt;68,135&lt;/td&gt;&lt;td&gt;65,351&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.02&lt;/td&gt;&lt;td&gt;0.60&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot; style=&quot;text-align:right&quot;&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
-## &lt;/table&gt;</code></pre>
+## ================================================
+##                         Dependent variable:     
+##                     ----------------------------
+##                                SALARY           
+##                          OLS       Fixed Effects
+##                          (1)            (2)     
+## ------------------------------------------------
+## GENDERfemale                       -15,835.10** 
+##                                     (7,124.54)  
+##                                                 
+## GENDERmale           47,449.88***   16,675.50** 
+##                       (1,164.50)    (7,125.55)  
+##                                                 
+## NPAGE                                854.76***  
+##                                       (27.29)   
+##                                                 
+## AVGHRS                              1,391.33*** 
+##                                       (52.27)   
+##                                                 
+## REV.mll                              754.29***  
+##                                       (7.15)    
+##                                                 
+## ASS.mll                              -35.40***  
+##                                       (1.44)    
+##                                                 
+## Constant             94,388.94***               
+##                        (824.71)                 
+##                                                 
+## ------------------------------------------------
+## Sate Fixed Effects?       No            Yes     
+## Observations            68,135        65,351    
+## R2                       0.02          0.60     
+## ================================================
+## Note:                *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
 <pre class="r"><code>#difference between male and female
 #16675.50 - - 15835.10 = 32510.6</code></pre>
 <p>Note: This table is omitting the coefficients for the fixed effects of State and Sector. These coefficients behave like constants when a subject belongs to a particular state or sector. For example, if a subject belongs to NY State and its NGO is on the Health sector, then these coefficients for the corresponding values would be included in the calculation of the price salary.</p>

@@ -1,6 +1,6 @@
 # Regression Analysis for gender equality in salaries for Non-Profits
 Ignacio Pezo Salazar  
-
+ 
 
 
 ##Introduction
@@ -55,27 +55,30 @@ Naive model of Salary onto Gender without any controls
 ```r
 ols <- lm( SALARY ~ GENDER , data=dat )
 
-stargazer(ols, header = F, type = "html")
+stargazer(ols, header = F, type = "text")
 ```
 
 ```
 ## 
-## <table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
-## <tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
-## <tr><td style="text-align:left"></td><td>SALARY</td></tr>
-## <tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">GENDERmale</td><td>47,449.880<sup>***</sup></td></tr>
-## <tr><td style="text-align:left"></td><td>(1,164.503)</td></tr>
-## <tr><td style="text-align:left"></td><td></td></tr>
-## <tr><td style="text-align:left">Constant</td><td>94,388.940<sup>***</sup></td></tr>
-## <tr><td style="text-align:left"></td><td>(824.714)</td></tr>
-## <tr><td style="text-align:left"></td><td></td></tr>
-## <tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>68,135</td></tr>
-## <tr><td style="text-align:left">R<sup>2</sup></td><td>0.024</td></tr>
-## <tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.024</td></tr>
-## <tr><td style="text-align:left">Residual Std. Error</td><td>151,982.600 (df = 68133)</td></tr>
-## <tr><td style="text-align:left">F Statistic</td><td>1,660.308<sup>***</sup> (df = 1; 68133)</td></tr>
-## <tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-## </table>
+## ================================================
+##                         Dependent variable:     
+##                     ----------------------------
+##                                SALARY           
+## ------------------------------------------------
+## GENDERmale                 47,449.880***        
+##                             (1,164.503)         
+##                                                 
+## Constant                   94,388.940***        
+##                              (824.714)          
+##                                                 
+## ------------------------------------------------
+## Observations                   68,135           
+## R2                             0.024            
+## Adjusted R2                    0.024            
+## Residual Std. Error   151,982.600 (df = 68133)  
+## F Statistic         1,660.308*** (df = 1; 68133)
+## ================================================
+## Note:                *p<0.1; **p<0.05; ***p<0.01
 ```
 
 ```r
@@ -112,7 +115,7 @@ dat$ASS.mll <- dat$ASSETS / 1000000
 #running regression
 fe <- lm(SALARY ~  GENDER + NPAGE + AVGHRS + REV.mll + ASS.mll + factor(STATE) - 1 + factor(NTMAJ12) - 1, data=dat)
 
-stargazer( ols, fe, type="html", 
+stargazer( ols, fe, type="text", 
            column.labels = c("OLS", "Fixed Effects"),
            omit.stat = c("adj.rsq", "f","ser"), 
            omit= c("STATE", "NTMAJ12"),            
@@ -122,37 +125,40 @@ stargazer( ols, fe, type="html",
 
 ```
 ## 
-## <table style="text-align:center"><tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="2"><em>Dependent variable:</em></td></tr>
-## <tr><td></td><td colspan="2" style="border-bottom: 1px solid black"></td></tr>
-## <tr><td style="text-align:left"></td><td colspan="2">SALARY</td></tr>
-## <tr><td style="text-align:left"></td><td>OLS</td><td>Fixed Effects</td></tr>
-## <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td></tr>
-## <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">GENDERfemale</td><td></td><td>-15,835.10<sup>**</sup></td></tr>
-## <tr><td style="text-align:left"></td><td></td><td>(7,124.54)</td></tr>
-## <tr><td style="text-align:left"></td><td></td><td></td></tr>
-## <tr><td style="text-align:left">GENDERmale</td><td>47,449.88<sup>***</sup></td><td>16,675.50<sup>**</sup></td></tr>
-## <tr><td style="text-align:left"></td><td>(1,164.50)</td><td>(7,125.55)</td></tr>
-## <tr><td style="text-align:left"></td><td></td><td></td></tr>
-## <tr><td style="text-align:left">NPAGE</td><td></td><td>854.76<sup>***</sup></td></tr>
-## <tr><td style="text-align:left"></td><td></td><td>(27.29)</td></tr>
-## <tr><td style="text-align:left"></td><td></td><td></td></tr>
-## <tr><td style="text-align:left">AVGHRS</td><td></td><td>1,391.33<sup>***</sup></td></tr>
-## <tr><td style="text-align:left"></td><td></td><td>(52.27)</td></tr>
-## <tr><td style="text-align:left"></td><td></td><td></td></tr>
-## <tr><td style="text-align:left">REV.mll</td><td></td><td>754.29<sup>***</sup></td></tr>
-## <tr><td style="text-align:left"></td><td></td><td>(7.15)</td></tr>
-## <tr><td style="text-align:left"></td><td></td><td></td></tr>
-## <tr><td style="text-align:left">ASS.mll</td><td></td><td>-35.40<sup>***</sup></td></tr>
-## <tr><td style="text-align:left"></td><td></td><td>(1.44)</td></tr>
-## <tr><td style="text-align:left"></td><td></td><td></td></tr>
-## <tr><td style="text-align:left">Constant</td><td>94,388.94<sup>***</sup></td><td></td></tr>
-## <tr><td style="text-align:left"></td><td>(824.71)</td><td></td></tr>
-## <tr><td style="text-align:left"></td><td></td><td></td></tr>
-## <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Sate Fixed Effects?</td><td>No</td><td>Yes</td></tr>
-## <tr><td style="text-align:left">Observations</td><td>68,135</td><td>65,351</td></tr>
-## <tr><td style="text-align:left">R<sup>2</sup></td><td>0.02</td><td>0.60</td></tr>
-## <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="2" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-## </table>
+## ================================================
+##                         Dependent variable:     
+##                     ----------------------------
+##                                SALARY           
+##                          OLS       Fixed Effects
+##                          (1)            (2)     
+## ------------------------------------------------
+## GENDERfemale                       -15,835.10** 
+##                                     (7,124.54)  
+##                                                 
+## GENDERmale           47,449.88***   16,675.50** 
+##                       (1,164.50)    (7,125.55)  
+##                                                 
+## NPAGE                                854.76***  
+##                                       (27.29)   
+##                                                 
+## AVGHRS                              1,391.33*** 
+##                                       (52.27)   
+##                                                 
+## REV.mll                              754.29***  
+##                                       (7.15)    
+##                                                 
+## ASS.mll                              -35.40***  
+##                                       (1.44)    
+##                                                 
+## Constant             94,388.94***               
+##                        (824.71)                 
+##                                                 
+## ------------------------------------------------
+## Sate Fixed Effects?       No            Yes     
+## Observations            68,135        65,351    
+## R2                       0.02          0.60     
+## ================================================
+## Note:                *p<0.1; **p<0.05; ***p<0.01
 ```
 
 ```r

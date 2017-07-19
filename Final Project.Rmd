@@ -7,7 +7,7 @@ output:
     keep_md: true
     code_folding: hide
 ---
-
+ 
 ```{r setup, include=FALSE}
 #install.packages("pander")
 #install.packages("magrittr")
@@ -61,7 +61,7 @@ Naive model of Salary onto Gender without any controls
 ```{r} 
 ols <- lm( SALARY ~ GENDER , data=dat )
 
-stargazer(ols, header = F, type = "html")
+stargazer(ols, header = F, type = "text")
 
 plot(y= log(dat$SALARY), x= as.factor(dat$GENDER))
 
@@ -94,7 +94,7 @@ dat$ASS.mll <- dat$ASSETS / 1000000
 #running regression
 fe <- lm(SALARY ~  GENDER + NPAGE + AVGHRS + REV.mll + ASS.mll + factor(STATE) - 1 + factor(NTMAJ12) - 1, data=dat)
 
-stargazer( ols, fe, type="html", 
+stargazer( ols, fe, type="text", 
            column.labels = c("OLS", "Fixed Effects"),
            omit.stat = c("adj.rsq", "f","ser"), 
            omit= c("STATE", "NTMAJ12"),            
@@ -257,7 +257,7 @@ One weakness of this design is that the comparison provides information about th
 
 ##Model 4:
 
-```{r}
+```{r, eval=TRUE}
 
 #subsetting the data to only 2012
 x <- dat$POST == 0
