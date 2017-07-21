@@ -9,7 +9,7 @@ html_document:
     
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 #install.packages("pander")
 #install.packages("magrittr")
 #install.packages("knitr")

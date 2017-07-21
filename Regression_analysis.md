@@ -2,6 +2,51 @@ Regression Analysis for gender equality in salaries of Non-Profit Executive Dire
 ================
 Ignacio Pezo Salazar
 
+``` r
+#install.packages("pander")
+#install.packages("magrittr")
+#install.packages("knitr")
+#install.packages("stargazer")
+#install.packages("ggplot2")
+
+library( pander ) # translate output to HTML / latex
+library( magrittr ) # use the pipe operator %>%
+library( knitr ) # kable function formats tables
+library( stargazer ) # format regression output
+```
+
+    ## 
+    ## Please cite as:
+
+    ##  Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+
+    ##  R package version 5.2. http://CRAN.R-project.org/package=stargazer
+
+``` r
+library( ggplot2 ) # graphing functions
+library(dplyr)
+```
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
+#loading data from github file
+dat <- readRDS(gzcon(url("https://github.com/icps86/Regression-analysis/blob/master/NP_data.rds?raw=true")))
+
+#formatting some variables into the desired class
+dat$FILERNAME1 <- as.character(dat$FILERNAME1)
+dat$GENDER <- as.character(dat$GENDER)
+```
+
 Introduction
 ------------
 
